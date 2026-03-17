@@ -1,0 +1,25 @@
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd" version="5.0">
+<display-name>ATS Reclutamiento</display-name>
+<!-- 
+        Habilitar multipart (subida de archivos) para la JSP de índice.
+        En Tomcat 10+ / Jakarta EE 9+ esto es necesario para request.getPart().
+     -->
+<servlet>
+<servlet-name>jsp</servlet-name>
+<servlet-class>org.apache.jasper.servlet.JspServlet</servlet-class>
+<multipart-config>
+<!--  10 MB máximo por archivo  -->
+<max-file-size>10485760</max-file-size>
+<!--  20 MB máximo por request  -->
+<max-request-size>20971520</max-request-size>
+<file-size-threshold>1048576</file-size-threshold>
+</multipart-config>
+</servlet>
+<session-config>
+<!--  Sesión válida por 30 minutos  -->
+<session-timeout>30</session-timeout>
+</session-config>
+<welcome-file-list>
+<welcome-file>index.jsp</welcome-file>
+</welcome-file-list>
+</web-app>

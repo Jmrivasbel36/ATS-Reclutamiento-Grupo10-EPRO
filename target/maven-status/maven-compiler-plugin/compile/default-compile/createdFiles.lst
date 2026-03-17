@@ -1,0 +1,4 @@
+com\eprogrupo10\ats\reclutamiento\grupo10\epro\resources\JakartaEE10Resource.class
+logic\ATSLogic.class
+com\eprogrupo10\ats\reclutamiento\grupo10\epro\JakartaRestConfiguration.class
+logic\Candidato.class
