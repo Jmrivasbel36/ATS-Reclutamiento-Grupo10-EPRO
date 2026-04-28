@@ -1,186 +1,182 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="logic.ATSLogic, logic.Candidato, java.util.*, java.io.InputStream" %>
-<%
-    // ── Inicializar sesión de candidatos ──────────────────────────────────
-    if (session.getAttribute("candidatos") == null) {
-        session.setAttribute("candidatos", new ArrayList<Candidato>());
-    }
+<%-- 
+    Document   : index
+    Created on : Apr 21, 2026, 4:21:35 PM
+    Author     : User
+--%>
 
-    @SuppressWarnings("unchecked")
-    List<Candidato> candidatos = (List<Candidato>) session.getAttribute("candidatos");
-
-    // ── Vaciar base de datos ──────────────────────────────────────────────
-    if ("1".equals(request.getParameter("limpiar"))) {
-        candidatos.clear();
-        response.sendRedirect("index.jsp");
-        return;
-    }
-
-    String mensajeError = null;
-
-    // ── Procesar registro de candidato ────────────────────────────────────
-    if ("POST".equalsIgnoreCase(request.getMethod()) && request.getParameter("registrar") != null) {
-        String nombre = request.getParameter("nombre");
-        String email  = request.getParameter("email");
-
-        // Leer PDF con Apache PDFBox
-        Part filePart = request.getPart("cv_pdf");
-        if (filePart != null && filePart.getSize() > 0) {
-            try (InputStream is = filePart.getInputStream()) {
-                // PDFBox se usa dentro de ATSLogic, no en el JSP
-                Candidato c = ATSLogic.procesarCVDesdeStream(nombre, email, is);
-                candidatos.add(c);
-                candidatos.sort((a, b) -> b.getScore() - a.getScore());
-                session.setAttribute("candidatos", candidatos);
-            } catch (Exception e) {
-                mensajeError = "Error procesando el PDF: " + e.getMessage();
-            }
-        } else {
-            mensajeError = "Debes subir un archivo PDF.";
-        }
-    }
-%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="jakarta.tags.core"%>
+<%@taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ATS — Sistema de Reclutamiento</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="CSS/styles.css">
+    <title>ATS | grupo 10</title>
+    <link rel="stylesheet" href="./CSS/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-<div class="wrapper">
-
-    <!-- ══ HEADER ══════════════════════════════════════════════════════════ -->
-    <header class="header-main">
-        <div class="header-inner">
-            <div class="header-label">ATS / Sistema de Reclutamiento</div>
-            <h1><%=ATSLogic.VACANTE_TITULO%></h1>
-            <div class="keywords-row">
-                <span class="kw-label">Keywords requeridas:</span>
-                <% for (String k : ATSLogic.KEYWORDS_PESO.keySet()) { %>
-                    <span class="keywords-tag"><%=k%></span>
-                <% } %>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1><i class="fas fa-briefcase"></i>ATS| Grupo 10</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="svVacante" class="active">Home</a></li>
+                    <li><a href="./Vacantes.jsp">Publicar Trabajos</a></li>
+                    <li><a href="./Candidato.jsp">Candidatos</a></li>
+                </ul>
+            </nav>
+            <div class="auth-buttons">
+                <a href="./login.jsp" class="btn btn-outline">Inicia Sesión</a>
+                <a class="btn btn-primary">Registrar</a>
             </div>
         </div>
     </header>
 
-    <main class="content">
-
-        <!-- ══ FORMULARIO ══════════════════════════════════════════════════ -->
-        <section class="panel">
-            <h2>Registro de Candidato</h2>
-
-            <% if (mensajeError != null) { %>
-                <div class="alert-error">⚠ <%=mensajeError%></div>
-            <% } %>
-
-            <form method="POST" enctype="multipart/form-data" action="index.jsp">
-                <div class="form-group">
-                    <label for="nombre">Nombre Completo</label>
-                    <input type="text" id="nombre" name="nombre" placeholder="Ej. María García López" required>
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Sistema De Gestión De Candidatos</h1>
+                <p>Vacantes, pipeline de candidatos, evaluación, notas, adjuntos y reportes. Incluye roles.</p>
+                <div class="search-box">
+                    <div class="search-group">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="job-search" placeholder="Job title, keywords, or company">
+                    </div>
+                    <div class="search-group">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <input type="text" id="location-search" placeholder="City, state, or remote">
+                    </div>
+                    <button class="btn btn-primary search-btn">Search Jobs</button>
                 </div>
-                <div class="form-group">
-                    <label for="email">Correo Electrónico</label>
-                    <input type="email" id="email" name="email" placeholder="correo@empresa.com" required>
-                </div>
-                <div class="form-group">
-                    <label for="cv_pdf">Subir CV (PDF)</label>
-                    <div class="file-drop">
-                        <input type="file" id="cv_pdf" name="cv_pdf" accept="application/pdf" required>
-                        <span class="file-hint">Selecciona o arrastra tu PDF aquí</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="job-listings">
+        <div class="container">
+            <div class="filters-panel">
+                <h3>Filters</h3>
+                <div class="filter-group">
+                    <h4>Job Type</h4>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="job-type" value="full-time"> Full-time</label>
+                        <label><input type="checkbox" name="job-type" value="part-time"> Part-time</label>
+                        <label><input type="checkbox" name="job-type" value="contract"> Contract</label>
+                        <label><input type="checkbox" name="job-type" value="internship"> Internship</label>
                     </div>
                 </div>
-                <div class="form-actions">
-                    <button type="submit" name="registrar" class="btn btn-primary">
-                        Procesar y Clasificar
-                    </button>
-                    <a href="?limpiar=1"
-                       onclick="return confirm('¿Vaciar toda la base de datos de candidatos?')">
-                        <button type="button" class="btn btn-outline">Vaciar BD</button>
-                    </a>
+                <div class="filter-group">
+                    <h4>Experience Level</h4>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="experience" value="entry"> Entry Level</label>
+                        <label><input type="checkbox" name="experience" value="mid"> Mid Level</label>
+                        <label><input type="checkbox" name="experience" value="senior"> Senior Level</label>
+                        <label><input type="checkbox" name="experience" value="executive"> Executive</label>
+                    </div>
                 </div>
-            </form>
-        </section>
-
-        <!-- ══ TABLA DE RESULTADOS ══════════════════════════════════════════ -->
-        <section class="results">
-            <div class="results-header">
-                <h2>Candidatos Clasificados</h2>
-                <span class="badge-count"><%=candidatos.size()%> registros</span>
+                <div class="filter-group">
+                    <h4>Salary Range</h4>
+                    <div class="range-slider">
+                        <input type="range" min="30000" max="200000" value="30000" class="slider" id="salary-range">
+                        <span id="salary-value">$30,000+</span>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <h4>Remote Options</h4>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="remote" value="remote"> Remote</label>
+                        <label><input type="checkbox" name="remote" value="hybrid"> Hybrid</label>
+                        <label><input type="checkbox" name="remote" value="onsite"> On-site</label>
+                    </div>
+                </div>
+                <button class="btn btn-outline btn-block">Clear Filters</button>
             </div>
 
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Candidato</th>
-                            <th>Match Score</th>
-                            <th>Tecnologías Detectadas</th>
-                            <th>Fecha Registro</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <% if (candidatos.isEmpty()) { %>
-                        <tr>
-                            <td colspan="5" class="empty-state">
-                                <div class="empty-icon">📋</div>
-                                No hay candidatos registrados aún.
-                            </td>
-                        </tr>
-                    <% } else {
-                           for (int i = 0; i < candidatos.size(); i++) {
-                               Candidato c = candidatos.get(i);
-                    %>
-                        <tr class="row-animate">
-                            <td class="col-rank">#<%=i + 1%></td>
-                            <td class="col-name">
-                                <strong><%=escapeHtml(c.getNombre())%></strong>
-                                <small><%=escapeHtml(c.getEmail())%></small>
-                            </td>
-                            <td class="col-score">
-                                <span class="score-pill <%=c.getRankClass()%>">
-                                    <%=c.getScore()%>%
-                                </span>
-                                <div class="score-bar">
-                                    <div class="score-fill <%=c.getRankClass()%>"
-                                         style="width:<%=c.getScore()%>%"></div>
+            <div class="jobs-container">
+                <div class="jobs-header">
+                    <h2>Vacantes Disponibles
+                        <span id="job-count">
+                            (<c:out value="${empty sessionScope.listaVacantes ? 0 : sessionScope.listaVacantes.size()}"/>)
+                        </span>
+                    </h2>
+                    <div class="sort-options">
+                        <label for="sort-by">Sort by:</label>
+                        <select id="sort-by">
+                            <option value="relevance">Relevance</option>
+                            <option value="recent">Most Recent</option>
+                            <option value="salary-high">Salary (High to Low)</option>
+                            <option value="salary-low">Salary (Low to High)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="jobs-list">
+                    <c:choose>
+                        <c:when test="${empty sessionScope.listaVacantes}">
+                            <div style="text-align:center; padding: 60px 20px; color: #888;">
+                                <i class="fas fa-briefcase" style="font-size: 48px; margin-bottom: 16px; display:block;"></i>
+                                <p>No hay vacantes disponibles en este momento.</p>
+                                <a href="./Vacantes.jsp" class="btn btn-primary" style="margin-top:12px;">Publicar primera vacante</a>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <c:forEach var="v" items="${sessionScope.listaVacantes}">
+                                <div class="job-card">
+                                    <div class="job-card-header">
+                                        <div class="company-logo">
+                                            <i class="fas fa-briefcase"></i>
+                                        </div>
+                                        <div class="job-info">
+                                            <h3 class="job-title"><c:out value="${v.nombre}"/></h3>
+                                            <p class="company-name">
+                                                <i class="fas fa-layer-group"></i>
+                                                <c:out value="${v.area}"/>
+                                            </p>
+                                        </div>
+                                        <span class="job-type-badge">
+                                            <c:choose>
+                                                <c:when test="${v.estado == 'Activa'}">
+                                                    <span style="background:#d1fae5; color:#065f46; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:600;">
+                                                        <i class="fas fa-circle" style="font-size:8px;"></i> Activa
+                                                    </span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span style="background:#fee2e2; color:#991b1b; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:600;">
+                                                        <i class="fas fa-circle" style="font-size:8px;"></i> <c:out value="${v.estado}"/>
+                                                    </span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </span>
+                                    </div>
+                                    <div class="job-description">
+                                        <p><c:out value="${v.descripcion}"/></p>
+                                    </div>
+                                    <div class="job-footer">
+                                        <div class="job-tags">
+                                            <span class="tag"><i class="fas fa-dollar-sign"></i>
+                                                <fmt:formatNumber value="${v.salario}" type="number" minFractionDigits="2" maxFractionDigits="2"/>
+                                            </span>
+                                        </div>
+                                        <button class="btn btn-outline apply-btn">Ver Detalle</button>
+                                    </div>
                                 </div>
-                            </td>
-                            <td class="col-kw">
-                                <% for (String kw : c.getKeywords().split(", ")) { %>
-                                    <% if (!kw.equals("—")) { %>
-                                        <span class="kw-chip"><%=kw.trim()%></span>
-                                    <% } else { %>
-                                        <span class="kw-none">—</span>
-                                    <% } %>
-                                <% } %>
-                            </td>
-                            <td class="col-date"><%=c.getFecha()%></td>
-                        </tr>
-                    <%   }
-                       } %>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    </main>
-</div>
+                            </c:forEach>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
 
-<%!
-    /** Escapa caracteres HTML para evitar XSS — equivalente a htmlspecialchars() en PHP */
-    private String escapeHtml(String s) {
-        if (s == null) return "";
-        return s.replace("&",  "&amp;")
-                .replace("<",  "&lt;")
-                .replace(">",  "&gt;")
-                .replace("\"", "&quot;")
-                .replace("'",  "&#39;");
-    }
-%>
+                <div class="pagination">
+                    <button class="pagination-btn"><i class="fas fa-chevron-left"></i></button>
+                    <button class="pagination-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <%-- script.js eliminado: las cards ahora vienen del servidor --%>
 </body>
 </html>
