@@ -3,6 +3,7 @@ logic\Controladora.class
 logic\FiltroSesion.class
 persistencia\EvaluacionJpaController.class
 logic\Usuario.class
+servlets\SvCandidato.class
 com\eprogrupo10\resources\JakartaEE10Resource.class
 persistencia\VacanteJpaController.class
 logic\Evaluacion.class
